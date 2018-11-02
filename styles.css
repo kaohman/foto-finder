@@ -84,10 +84,25 @@ button {
   width: 40%;
 }
 
-.choose-button {
+.choose-label {
   display: block;
   margin-top: 40px;
+  background-color: #5B4447;
+  border: none;
+  color: white;
+  margin: 40px 0 20px 0;
+  padding: 15px 15px;
   width: 100%;
+  text-align: center;
+}
+
+.choose-input {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
 }
 
 .bottom-buttons {
