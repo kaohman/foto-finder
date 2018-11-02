@@ -84,6 +84,14 @@ button {
   width: 40%;
 }
 
+button:disabled {
+  background-color: lightgrey;
+}
+
+button:hover:enabled {
+  background-color: #938284;
+}
+
 .choose-label {
   display: block;
   margin-top: 40px;
@@ -94,6 +102,10 @@ button {
   padding: 15px 15px;
   width: 100%;
   text-align: center;
+}
+
+.choose-label:hover {
+  background-color: #938284;
 }
 
 .choose-input {
