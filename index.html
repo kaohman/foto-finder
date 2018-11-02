@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Foto Finder</title>
+    <link rel="stylesheet" type="text/css" href="normalize.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:600,800" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <div class="dark-background">
+      <header>
+        <h1>FOTO<img class="logo" src="assets/foto-finder-logo.svg" alt="logo">FINDER</h1>
+        <div class="flex-search">
+          <input class="search-input" type="text" name="search-input" placeholder="Search">
+          <button class="search-button"><img class="search-icon" src="assets/search.svg" alt="search icon"></button>
+        </div>
+      </header>
+      <form>
+        <label for="title">Title</label>
+        <input type="text" name="title">
+        <label for="caption">Caption</label>
+        <input type="text" name="caption">
+        <button class="choose-button">Choose File</button>
+        <div class="bottom-buttons">
+          <button>View <span>0</span> Favorites</button>
+          <button>Add to Album</button>
+        </div>
+      </form>
+    </div>
+    <section class="card-section">
+      <div class="photo-card" data-id=${photo.id}>
+        <p class="title">${photo.title}</p>
+        <img class="photo" src="assets/test.jpg" alt="photo">
+        <p class="caption">${photo.caption}</p>
+        <section class="card-footer">
+          <img class="card-icons" src="assets/delete.svg" alt="delete icon">
+          <img class="card-icons favorite-icon" src="assets/favorite.svg" alt="favorite icon">
+        </section>
+      </div>
+      <div class="photo-card" data-id=${photo.id}>
+        <p class="title">${photo.title}</p>
+        <img class="photo" src="assets/test.jpg" alt="photo">
+        <p class="caption">${photo.caption}</p>
+        <section class="card-footer">
+          <img class="card-icons" src="assets/delete.svg" alt="delete icon">
+          <img class="card-icons favorite-icon" src="assets/favorite.svg" alt="favorite icon">
+        </section>
+      </div>
+      <div class="photo-card" data-id=${photo.id}>
+        <p class="title">${photo.title}</p>
+        <img class="photo" src="assets/test.jpg" alt="photo">
+        <p class="caption">${photo.caption}</p>
+        <section class="card-footer">
+          <img class="card-icons" src="assets/delete.svg" alt="delete icon">
+          <img class="card-icons favorite-icon" src="assets/favorite.svg" alt="favorite icon">
+        </section>
+      </div>
+      <div class="photo-card" data-id=${photo.id}>
+        <p class="title">${photo.title}</p>
+        <img class="photo" src="assets/test.jpg" alt="photo">
+        <p class="caption">${photo.caption}</p>
+        <section class="card-footer">
+          <img class="card-icons delete-icon" src="assets/delete.svg" alt="delete icon">
+          <img class="card-icons favorite-icon" src="assets/favorite.svg" alt="favorite icon">
+        </section>
+      </div>
+    </section>
+  </body>
+</html>
