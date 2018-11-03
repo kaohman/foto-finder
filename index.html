@@ -21,25 +21,15 @@
         <input class="text-inputs" type="text" name="title" id="title">
         <label for="caption">Caption</label>
         <input class="text-inputs" type="text" name="caption" id="caption">
-        <label class="choose-label" for="photo-input">Choose File</label>
+        <label class="form-buttons choose-label" for="photo-input">Choose File</label>
         <input class="choose-input" type="file" accept="image/*" id="photo-input" name="input">
         <div class="bottom-buttons">
-          <button id="js-view-favorites">View <span>0</span> Favorites</button>
-          <button disabled id="js-add-to-album">Add to Album</button>
+          <button class="form-buttons" id="js-view-favorites">View <span>0</span> Favorites</button>
+          <button class="form-buttons" disabled id="js-add-to-album">Add to Album</button>
         </div>
       </form>
     </div>
-    <section class="card-section">
-<!--       <div class="photo-card" data-id=${photo.id}>
-        <p class="title">This is a long title to test the hidden attribute</p>
-        <img class="photo" src="assets/test.jpg" alt="photo">
-        <p class="caption">This is a test caption to see what it looks like when we have a long block of text. kddhfkljfkljksjfkldjsflkjdlkfjsdklfjlkdjflksdjlkfjdlkfj</p>
-        <section class="card-footer">
-          <img class="card-icons" src="assets/delete.svg" alt="delete icon">
-          <img class="card-icons favorite-icon" src="assets/favorite.svg" alt="favorite icon">
-        </section>
-      </div> -->
-    </section>
+    <section class="card-section"></section>
     <p class="card-placeholder">Add some photos to your album!</p>
     <script src="photo.js"></script>
     <script src="main.js"></script>
