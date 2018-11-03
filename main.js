@@ -7,6 +7,7 @@ var textInputs = document.querySelectorAll('.text-inputs');
 var chooseFileButton = document.getElementById('photo-input');
 var photosArray = [];
 var cardSection = document.querySelector('.card-section');
+var favoriteCounter = 0;
 
 // FIND A WAY TO KEEP THIS LOCAL!!!
 var photoURL; 
@@ -20,8 +21,21 @@ addToAlbumButton.addEventListener('click', function() {
 cardSection.addEventListener('click', event => {
   if (event.target.classList.contains('delete-button')) {
     deleteCard(event);
+  } else if (event.target.classList.contains('favorite-button')) {
+    favoriteCard(event);
   }
 });
+
+function checkForFavorite(photoObj, cardTarget) {
+  if (photoObj.favorite === true) {
+    favoriteCounter++
+    cardTarget.classList.add('favorite-button-active');
+  } else {
+    if (favoriteCounter > 0) { favoriteCounter-- };
+    cardTarget.classList.remove('favorite-button-active');
+  }
+  document.getElementById('js-favorite-counter').innerText = favoriteCounter;
+}
 
 function addCardPlaceholder() {
   document.querySelector('.card-placeholder').classList.remove('hide-placeholder');
@@ -59,7 +73,7 @@ function createCard(photo) {
       <p class="caption">${photo.caption}</p>
       <section class="card-footer">
         <button class="icon-buttons delete-button"></button>
-        <button class="icon-buttons favorite-button" disabled></button>
+        <button class="icon-buttons favorite-button"></button>
       </section>
     </div>`;
   var cardSection = document.querySelector('.card-section');
@@ -73,18 +87,24 @@ function createCardsOnReload() {
       var photoObj = new Photo(object.title, object.caption, object.file, object.favorite, object.id);
       photosArray.push(photoObj);
       createCard(photoObj);
+      var cardTarget = findFavoriteTarget(photoObj.id);
+      checkForFavorite(photoObj, cardTarget);
     });
     removeCardPlaceholder();
+  } else {
+    addCardPlaceholder();
   }
 }
 
 function deleteCard() {
   var objectId = event.target.parentElement.parentElement.dataset.id;
   var index = findIndexNumber(objectId);
-  debugger
   photosArray[index].deleteFromStorage(index);
   photosArray.splice(index, 1);
   event.target.closest('.photo-card').remove();
+  if (photosArray.length === 0) {
+    addCardPlaceholder();
+  }
 }
 
 function findIndexNumber(objId) {
@@ -107,6 +127,24 @@ function enableButton(button) {
   button.disabled = false;
 }
 
+function favoriteCard() {
+  var cardTarget = event.target;
+  var objectId = cardTarget.parentElement.parentElement.dataset.id;
+  var index = findIndexNumber(objectId);
+  photosArray[index].updateFavorite();
+  photosArray[index].saveToStorage(photosArray);
+  checkForFavorite(photosArray[index], cardTarget);
+}
+
+function findFavoriteTarget(id) {
+  var cards = cardSection.children;
+  for (var i = 0; i < cards.length; i++) {
+    if(parseInt(cards[i].dataset.id) === id) {
+      return cards[i].firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.firstElementChild.nextElementSibling;
+    }
+  }
+}
+
 function getPhoto(event) {
   photoURL = convertPhotoFile(event.target.files[0]);
   testTextFields();
@@ -125,7 +163,7 @@ function saveNewPhotoCard(title, caption, photoUrl) {
   event.preventDefault();
   var photoObj = new Photo(title, caption, photoUrl);
   createCard(photoObj);
-  photosArray.unshift(photoObj);
+  photosArray.push(photoObj);
   photoObj.saveToStorage(photosArray);
   disableButton(addToAlbumButton);
   removeCardPlaceholder();

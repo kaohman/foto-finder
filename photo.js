@@ -16,7 +16,12 @@ class Photo {
     var retrievedJSON = localStorage.getItem('array');
     var parsedObj = JSON.parse(retrievedJSON);
     parsedObj.splice(index, 1);
-    this.saveToStorage(parsedObj);
+
+    if (parsedObj.length === 0) {
+      localStorage.clear();
+    } else {
+      this.saveToStorage(parsedObj);
+    }
   }
 
   findIndex(array, objId) {
