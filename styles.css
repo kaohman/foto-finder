@@ -227,14 +227,14 @@ p {
 }
 
 .favorite-button {
-  background-image: url('assets/favorite-active.svg');
+  background-image: url('assets/favorite.svg');
   position: absolute;
   right: 10px;
   top: 8px;
 }
 
-.favorite-button:disabled {
-  background-image: url('assets/favorite.svg');
+.favorite-button-active {
+  background-image: url('assets/favorite-active.svg');
 }
 
 .delete-button:hover {
