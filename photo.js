@@ -1,6 +1,6 @@
 class Photo {
-  constructor(title, caption, file, favorite) {
-    this.id = Date.now;
+  constructor(title, caption, file, favorite, id) {
+    this.id = id || Date.now();
     this.title = title;
     this.caption = caption;
     this.file = file;

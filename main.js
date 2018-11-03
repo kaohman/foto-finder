@@ -1,26 +1,30 @@
 // URL.revokeObjectURL()
 
 var addToAlbumButton = document.getElementById('js-add-to-album');
+var textInputs = document.querySelectorAll('.text-inputs');
 // var viewFavorites = document.getElementById('js-view-favorites');
 // var searchButton = document.getElementById('js-search');
+var chooseFileButton = document.getElementById('photo-input');
 var photosArray = [];
+var photoURL;
 
-document.getElementById('photo-input').addEventListener('change', getPhoto);
+chooseFileButton.addEventListener('change', getPhoto);
+addToAlbumButton.addEventListener('click', function() {
+  saveNewPhotoCard(textInputs[0].value, textInputs[1].value, photoURL);
+});
 
-function checkTextFields(inputs) {
-  inputs.forEach((input, i, inputs) => {
-    if (inputs[0].value && inputs[1].value) {
-      enableButton(addToAlbumButton);
-    }
-      
-    input.addEventListener('input', event => {
-      if (inputs[0].value && inputs[1].value) {
-        enableButton(addToAlbumButton);
-      } else {
-        disableButton(addToAlbumButton);
-      }
-    });
-  });
+function testTextFields() {
+  checkTextFields();
+  textInputs[0].addEventListener('input', checkTextFields);
+  textInputs[1].addEventListener('input', checkTextFields);
+}
+
+function checkTextFields() {
+  if (textInputs[0].value && textInputs[1].value) {
+    enableButton(addToAlbumButton);
+  } else {
+    disableButton(addToAlbumButton);
+  }
 }
 
 function convertPhotoFile(photo) {
@@ -63,12 +67,8 @@ function enableButton(button) {
 }
 
 function getPhoto(event) {
-  var photoURL = convertPhotoFile(event.target.files[0]);
-  var textInputs = document.querySelectorAll('.text-inputs');
-  checkTextFields(textInputs);
-  addToAlbumButton.addEventListener('click', function() {
-    saveNewPhotoCard(textInputs[0].value, textInputs[1].value, photoURL);
-  });
+  photoURL = convertPhotoFile(event.target.files[0]);
+  testTextFields();
 }
 
 function removeCardPlaceholder() {
@@ -87,6 +87,25 @@ function saveNewPhotoCard(title, caption, photoUrl) {
   photoObj.saveToStorage(photosArray);
   disableButton(addToAlbumButton);
   removeCardPlaceholder();
+  clearTextInputs();
+  removeListeners();
+}
+
+function clearTextInputs() {
+  textInputs.forEach(function(photo) {
+    photo.value = '';
+  });
+}
+
+function removeListeners() {
+  textInputs[0].removeEventListener('input', checkTextFields);
+  textInputs[1].removeEventListener('input', checkTextFields);
+}
+
+function clearPhotoInput() {
+  chooseFileButton.value = '';
+  var clone = chooseFileButton.cloneNode(true);
+  chooseFileButton.parentElement.appendChild(clone);
 }
 
 
