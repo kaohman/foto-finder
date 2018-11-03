@@ -12,8 +12,19 @@ class Photo {
     localStorage.setItem('array', arrayJSON);
   }
 
-  deleteFromStorage() {
+  deleteFromStorage(index) {
+    var retrievedJSON = localStorage.getItem('array');
+    var parsedObj = JSON.parse(retrievedJSON);
+    parsedObj.splice(index, 1);
+    this.saveToStorage(parsedObj);
+  }
 
+  findIndex(array, objId) {
+    for (var i = 0; i < array.length; i++) {
+      if (array[i].id === objId) {
+        return i
+      }
+    }
   }
 
   updatePhoto() {
@@ -21,6 +32,6 @@ class Photo {
   }
 
   updateFavorite() {
-    
+    this.favorite = !this.favorite;
   }
 }
