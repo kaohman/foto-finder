@@ -1,33 +1,41 @@
+// URL.revokeObjectURL()
+
 var uploadPhotoButton = document.getElementById('photo-input');
-var addToAlbum = document.getElementById('js-add-to-album');
+var addToAlbumButton = document.getElementById('js-add-to-album');
 var viewFavorites = document.getElementById('js-view-favorites');
 var searchButton = document.getElementById('js-search');
-
 var photosArray = [];
+
+// addToAlbum.addEventListener('submit', stopRefresh);
+
+// function stopRefresh(event) {
+//   event.preventDefault();
+// }
 
 uploadPhotoButton.addEventListener('change', getPhoto);
 
 function getPhoto(event) {
-  var photoFile = event.target.files;
-  var textInputs = document.querySelectorAll('.js-text-inputs');
+  var photoURL = convertPhotoFile(event.target.files[0]);
+  console.log(photoURL);
+  var textInputs = document.querySelectorAll('.text-inputs');
   checkTextFields(textInputs);
-  
-  addToAlbum.addEventListener('click', function() {
-    saveNewPhotoCard(titleInput, captionInput, photoFile);
+
+  addToAlbumButton.addEventListener('click', function() {
+    saveNewPhotoCard(textInputs[0].value, textInputs[1].value, photoURL);
   });
 };
 
 function checkTextFields(inputs) {
   inputs.forEach((input, i, inputs) => {
     if (inputs[0].value && inputs[1].value) {
-      enableButton(addToAlbum);
+      enableButton(addToAlbumButton);
     }
       
     input.addEventListener('input', event => {
       if (inputs[0].value && inputs[1].value) {
-        enableButton(addToAlbum);
+        enableButton(addToAlbumButton);
       } else {
-        disableButton(addToAlbum);
+        disableButton(addToAlbumButton);
       }
     });
   });
@@ -41,16 +49,22 @@ function enableButton(button) {
   button.disabled = false;
 };
 
-function saveNewPhotoCard(title, caption, photo) {
-  event.preventDefault();
-  console.log(photo);
-
-  // createCard();
-  disableButton(addToAlbum);
+function convertPhotoFile(photo) {
+  return window.URL.createObjectURL(photo);
 }
 
-function createCard() {
-newCard = `
+function saveNewPhotoCard(title, caption, photoUrl) {
+  event.preventDefault();
+
+  var photoObj = new Photo(title, caption, photoUrl);
+  createCard(photoObj);
+  photosArray.push(photoObj);
+  photoObj.saveToStorage(photosArray);
+  disableButton(addToAlbumButton);
+}
+
+function createCard(photo) {
+var cardHTML = `
   <div class="photo-card" data-id=${photo.id}>
     <p class="title">${photo.title}</p>
     <img class="photo" src="${photo.file}" alt="use uploaded photo">
@@ -60,4 +74,8 @@ newCard = `
       <img class="card-icons favorite-icon" src="assets/favorite.svg" alt="favorite icon">
     </section>
   </div>`;
+  var cardSection = document.querySelector('.card-section');
+  cardSection.insertAdjacentHTML('afterbegin', cardHTML);
 }
+
+
