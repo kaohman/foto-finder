@@ -32,8 +32,12 @@ class Photo {
     }
   }
 
-  updatePhoto() {
+  updateText(newText, type) {
+    this[type] = newText;
+  }
 
+  updatePhoto() {
+    
   }
 
   updateFavorite() {
