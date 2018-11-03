@@ -14,6 +14,7 @@ var photoURL;
 
 window.addEventListener('load', createCardsOnReload);
 chooseFileButton.addEventListener('change', getPhoto);
+cardSection.addEventListener('dblclick', updateCard);
 addToAlbumButton.addEventListener('click', function() {
   saveNewPhotoCard(textInputs[0].value, textInputs[1].value, photoURL);
 });
@@ -26,6 +27,10 @@ cardSection.addEventListener('click', event => {
   }
 });
 
+function addCardPlaceholder() {
+  document.querySelector('.card-placeholder').classList.remove('hide-placeholder');
+}
+
 function checkForFavorite(photoObj, cardTarget) {
   if (photoObj.favorite === true) {
     favoriteCounter++
@@ -35,10 +40,6 @@ function checkForFavorite(photoObj, cardTarget) {
     cardTarget.classList.remove('favorite-button-active');
   }
   document.getElementById('js-favorite-counter').innerText = favoriteCounter;
-}
-
-function addCardPlaceholder() {
-  document.querySelector('.card-placeholder').classList.remove('hide-placeholder');
 }
 
 function checkTextFields() {
@@ -68,9 +69,9 @@ function convertPhotoFile(photo) {
 function createCard(photo) {
   var cardHTML = `
     <div class="photo-card" data-id=${photo.id}>
-      <p class="title">${photo.title}</p>
+      <p class="js-text title">${photo.title}</p>
       <img class="photo" src="${photo.file}" alt="use uploaded photo">
-      <p class="caption">${photo.caption}</p>
+      <p class="js-text caption">${photo.caption}</p>
       <section class="card-footer">
         <button class="icon-buttons delete-button"></button>
         <button class="icon-buttons favorite-button"></button>
@@ -171,10 +172,52 @@ function saveNewPhotoCard(title, caption, photoUrl) {
   removeListeners();
 }
 
+function saveTextOnClick(event) {
+  updateObject();    
+  setUneditable(); 
+  document.body.removeEventListener('keypress', saveTextOnEnter);
+  event.target.removeEventListener('blur', saveTextOnClick);
+}
+
+function saveTextOnEnter(event) {
+  if (event.code === 'Enter') {
+    updateObject();    
+    setUneditable(); 
+    document.body.removeEventListener('keypress', saveTextOnEnter);
+    event.target.removeEventListener('blur', saveTextOnClick);
+  }
+}
+
+function setEditable() {
+  event.target.contentEditable = true;
+}
+
+function setUneditable() {
+  event.target.contentEditable = false;
+}
+
 function testTextFields() {
   checkTextFields();
   textInputs[0].addEventListener('input', checkTextFields);
   textInputs[1].addEventListener('input', checkTextFields);
+}
+
+function updateCard() {
+  if (event.target.classList.contains('js-text')) {
+    setEditable();
+    document.body.addEventListener('keypress', saveTextOnEnter);
+    event.target.addEventListener('blur', saveTextOnClick);
+  }
+}
+
+function updateObject() {
+  var index = findIndexNumber(event.target.parentElement.dataset.id);
+  if (event.target.classList.contains('title')) {
+    photosArray[index].updateText(event.target.innerText, 'title');
+  } else {
+    photosArray[index].updateText(event.target.innerText, 'caption');
+  }
+  photosArray[index].saveToStorage(photosArray);
 }
 
 
