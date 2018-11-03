@@ -53,6 +53,7 @@ label {
   border: 2px solid #C2B2B4;
   font-size: 15px;
   width: 350px;
+  line-height: 1.4;
 }
 
 .search-input:placeholder {
@@ -145,6 +146,19 @@ input {
   grid-gap: 30px;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   padding: 20px;
+}
+
+.card-placeholder {
+  margin: 0;
+  padding: 20px;
+  height: 200px;
+  background-color: #C2B2B4;
+  font-size: 28px;
+  text-align: center;
+}
+
+.hide-placeholder {
+  display: none;
 }
 
 .photo-card {
