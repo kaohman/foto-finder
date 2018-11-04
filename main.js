@@ -1,17 +1,11 @@
-// When ‘Filtering and Searching by Text’ and ‘Viewing Phtos’, photos that do not need to be shown on the dom should be completely removed from the dom, instead of only being hidden from view
-
-// auto revoke blob url!!!
-// URL.revokeObjectURL()
-
 var addToAlbumButton = document.getElementById('js-add-to-album');
 var cardSection = document.querySelector('.card-section');
 var chooseFileButton = document.getElementById('photo-input');
 var showButton = document.querySelector('.show-button');
 var textInputs = document.querySelectorAll('.text-inputs');
-var viewFavorites = document.getElementById('js-view-favorites');
 var photosArray = [];
 
-// FIND A WAY TO KEEP THESE LOCAL!!!
+// FIND A WAY TO KEEP THESE LOCAL
 var photoURL; 
 var favoriteCounter = 0;
 
@@ -51,9 +45,10 @@ function clearTextInputs() {
 
 function convertPhotoFile(photo) {
   return window.URL.createObjectURL(photo);
-}
+}  
 
 function createCards(array) {
+  favoriteCounter = 0;
   array.reverse()
   for (var i = 0; i < array.length; i++) {
     if (array[i].favorite) {
@@ -92,12 +87,11 @@ function createCardsOnReload() {
 
 function deleteCard() {
   var objectId = event.target.parentElement.parentElement.dataset.id;
-  debugger
   var index = findIndexNumber(objectId);
   photosArray[index].deleteFromStorage(index);
   photosArray.splice(index, 1);
   event.target.closest('.photo-card').remove();
-  showRecentCards();
+  showRecentCards(photosArray);
   if (photosArray.length === 0) {
     addCardPlaceholder();
   }
@@ -119,7 +113,6 @@ function enableButton(button) {
 
 function findFavoriteTarget(id) {
   var cards = cardSection.children;
-  debugger
   for (var i = 0; i < cards.length; i++) {
     if(parseInt(cards[i].dataset.id) === id) {
       return cards[i].firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.firstElementChild.nextElementSibling;
@@ -134,6 +127,9 @@ function findIndexNumber(objId) {
     }
   }
 }
+
+// regular live search works on all cards (photosArray)
+// want favorites search to work only on favoriteArray
 
 function liveSearch() {
   removeAllCards();
@@ -224,14 +220,15 @@ function showCards() {
 
 function showRecentCards() {
   removeAllCards();
-  if (photosArray.length < 10) {
+  if (photosArray.length <= 10) {
     var showAll = photosArray.slice().reverse();
     createCards(showAll);
     disableButton(showButton);
   } else {
     enableButton(showButton);
-    var shownArray = photosArray.slice(0, 10); 
+    var shownArray = photosArray.slice(photosArray.length-10, photosArray.length).reverse(); 
     createCards(shownArray);
+    showButton.innerText = 'Show More...';
   }
 }
 
@@ -283,9 +280,16 @@ function updateObject() {
   photosArray[index].saveToStorage(photosArray);
 }
 
+// When user clicks favorites button - other cards are removed from DOM.
+// Favorite button toggles to "Show All Cards"
+// When Show All Cards is clicked, all cards are shown and show more button should say show less.
+// If user unfavorites a card while viewing favorites, card should be removed from DOM
+// if you are showing favorites, the show more button should be disabled
+
 
 // FAVORITES BUTTON
-// viewFavorites.addEventListener('click', showFavorites);
+var viewFavoritesButton = document.getElementById('js-view-favorites');
+viewFavoritesButton.addEventListener('click', showFavorites);
 cardSection.addEventListener('click', event => {
   if (event.target.classList.contains('delete-button')) {
     deleteCard(event);
@@ -294,19 +298,42 @@ cardSection.addEventListener('click', event => {
   }
 });
 
-// function showFavorites() {
-//   var allCards = Array.from(document.querySelectorAll('.photo-card'));
+function toggleFavoritesButton() {
+  if (viewFavoritesButton.innerHTML === `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`) {
+    viewFavoritesButton.innerHTML = 'View All Photos';
+    return true
+  } else {
+    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`;
+    return false
+  }
+}
 
-//   debugger
-//   allCards.forEach(card => {
-//     cardTarget = card.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.firstElementChild.nextElementSibling;
-//     if (cardTarget.classList.contains('favorite-button-active')) {
-//       cardTarget.classList.remove('hidden');
-//     } else {
-//       cardTarget.classList.add('hidden');
-//     }
-//   });
-// }
+function findFavorites() {
+  var newArray = [];
+  for(var i = 0; i < photosArray.length; i++) {
+    if (photosArray[i].favorite === true) {
+      newArray.push(photosArray[i]);
+    }
+  }
+  return newArray
+}
+
+function showFavorites() {
+  event.preventDefault();
+  removeAllCards();
+  var showFavorites = toggleFavoritesButton();
+  if (showFavorites) {
+    var favoritesArray = findFavorites();
+    favoritesArray = sortShownArray(favoritesArray);
+    createCards(favoritesArray);
+    disableButton(showButton);
+  } else {
+    var showAll = photosArray.slice().reverse();
+    createCards(showAll);
+    enableButton(showButton);
+    document.getElementById('js-favorite-counter').innerText = favoriteCounter;
+  }
+}
 
 function updateCounter(bool) {
   if (bool) { 
@@ -314,7 +341,9 @@ function updateCounter(bool) {
   } else {
     favoriteCounter--
   }
-  document.getElementById('js-favorite-counter').innerText = favoriteCounter;
+  if (viewFavoritesButton.innerText.indexOf('Favorites') !== -1) {
+    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`;
+  }
 }
 
 function favoriteCard() {
