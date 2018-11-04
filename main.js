@@ -1,4 +1,6 @@
 // When ‘Filtering and Searching by Text’ and ‘Viewing Phtos’, photos that do not need to be shown on the dom should be completely removed from the dom, instead of only being hidden from view
+
+// auto revoke blob url!!!
 // URL.revokeObjectURL()
 
 var addToAlbumButton = document.getElementById('js-add-to-album');
@@ -54,6 +56,12 @@ function convertPhotoFile(photo) {
 function createCards(array) {
   array.reverse()
   for (var i = 0; i < array.length; i++) {
+    if (array[i].favorite) {
+      var favorited = 'favorite-button-active';
+      updateCounter(true);
+    } else {
+      var favorited = '';
+    }
     var cardHTML = `
       <div class="photo-card" data-id=${array[i].id}>
         <p class="js-text title">${array[i].title}</p>
@@ -61,7 +69,7 @@ function createCards(array) {
         <p class="js-text caption">${array[i].caption}</p>
         <section class="card-footer">
           <button class="icon-buttons delete-button"></button>
-          <button class="icon-buttons favorite-button"></button>
+          <button class="icon-buttons favorite-button ${favorited}"></button>
         </section>
       </div>`;
     cardSection.insertAdjacentHTML('afterbegin', cardHTML);
@@ -74,8 +82,6 @@ function createCardsOnReload() {
     parsedCard.forEach(function(object) {
       var photoObj = new Photo(object.title, object.caption, object.file, object.favorite, object.id);
       photosArray.push(photoObj);
-      var cardTarget = findFavoriteTarget(photoObj.id);
-      // checkForFavorite(photoObj, cardTarget);
     });
     removeCardPlaceholder();
     showRecentCards();
@@ -113,6 +119,7 @@ function enableButton(button) {
 
 function findFavoriteTarget(id) {
   var cards = cardSection.children;
+  debugger
   for (var i = 0; i < cards.length; i++) {
     if(parseInt(cards[i].dataset.id) === id) {
       return cards[i].firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.firstElementChild.nextElementSibling;
@@ -276,20 +283,8 @@ function updateObject() {
   photosArray[index].saveToStorage(photosArray);
 }
 
-// function to get unique IDs from cards using event target
-// function getCardID(target) {
-//   return objId = target.dataset.id;
-// }
 
-// // function to get array index using unique ID
-// function getArrayIndex(array, objId) {
-//   for (var i = 0; i < array.length; i++) {
-//     if (array[i].id === objId) {
-//       return i
-//     }
-//   }
-// }
-
+// FAVORITES BUTTON
 // viewFavorites.addEventListener('click', showFavorites);
 cardSection.addEventListener('click', event => {
   if (event.target.classList.contains('delete-button')) {
@@ -313,13 +308,11 @@ cardSection.addEventListener('click', event => {
 //   });
 // }
 
-function checkForFavorite(photoObj, cardTarget) {
-  if (photoObj.favorite === true) {
+function updateCounter(bool) {
+  if (bool) { 
     favoriteCounter++
-    cardTarget.classList.add('favorite-button-active');
   } else {
-    if (favoriteCounter > 0) { favoriteCounter-- };
-    cardTarget.classList.remove('favorite-button-active');
+    favoriteCounter--
   }
   document.getElementById('js-favorite-counter').innerText = favoriteCounter;
 }
@@ -330,7 +323,12 @@ function favoriteCard() {
   var index = findIndexNumber(objectId);
   photosArray[index].updateFavorite();
   photosArray[index].saveToStorage(photosArray);
-  checkForFavorite(photosArray[index], cardTarget);
+  updateCounter(photosArray[index].favorite);
+  if (photosArray[index].favorite) {
+    event.target.classList.add('favorite-button-active');
+  } else {
+    event.target.classList.remove('favorite-button-active');
+  }
 }
 
 
