@@ -129,18 +129,30 @@ function findIndexNumber(objId) {
 }
 
 // regular live search works on all cards (photosArray)
-// want favorites search to work only on favoriteArray
+// want favorites search to work only on favoriteArray when only favorites are shown
 
-function liveSearch() {
+function liveSearch(array) {
   removeAllCards();
   var searchInput = this.value;
+  if(viewFavoritesButton.innerHTML === 'View All Photos') {
+    favoritesSearch(searchInput);
+    return
+  }
+
   if (searchInput === '') {
     showRecentCards();
     return
   }
+
   var shownArray = searchObjectText(photosArray, searchInput);
   shownArray = sortShownArray(shownArray);
   createCards(shownArray);  
+}
+
+function favoritesSearch(input) {
+  var favoritesArray = sortShownArray(findFavorites());
+  var shownArray = searchObjectText(favoritesArray, input);
+  createCards(shownArray);
 }
 
 function getPhoto(event) {
@@ -280,12 +292,6 @@ function updateObject() {
   photosArray[index].saveToStorage(photosArray);
 }
 
-// When user clicks favorites button - other cards are removed from DOM.
-// Favorite button toggles to "Show All Cards"
-// When Show All Cards is clicked, all cards are shown and show more button should say show less.
-// If user unfavorites a card while viewing favorites, card should be removed from DOM
-// if you are showing favorites, the show more button should be disabled
-
 
 // FAVORITES BUTTON
 var viewFavoritesButton = document.getElementById('js-view-favorites');
@@ -323,8 +329,7 @@ function showFavorites() {
   removeAllCards();
   var showFavorites = toggleFavoritesButton();
   if (showFavorites) {
-    var favoritesArray = findFavorites();
-    favoritesArray = sortShownArray(favoritesArray);
+    var favoritesArray = sortShownArray(findFavorites());
     createCards(favoritesArray);
     disableButton(showButton);
   } else {
