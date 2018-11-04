@@ -9,6 +9,7 @@
 body {
   padding: 0;
   margin: 0;
+  background-color: #C2B2B4;
 }
 
 /*HEADER*/
@@ -143,7 +144,6 @@ input {
 
 /*CARDS*/
 .card-section {
-  background-color: #C2B2B4;
   display: grid;
   grid-gap: 30px;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -170,6 +170,10 @@ input {
   margin: 10px auto;
   position: relative;
   width: 280px;
+}
+
+.hidden {
+  display: none;
 }
 
 p {
@@ -243,6 +247,24 @@ p {
 
 .favorite-button:hover {
   background-image: url('assets/favorite-active.svg');
+}
+
+.show-button {
+  display: block;
+  color: white;
+  text-align: center;
+  margin: 20px auto;
+  padding: 8px;
+  background-color: #5B4447;
+  border: none;
+}
+
+.show-button:hover:enabled {
+  background-color: #938284;
+}
+
+.show-button:disabled {
+  background-color: lightgrey;
 }
 
 @media screen and (max-width: 1130px) {
