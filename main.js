@@ -1,16 +1,16 @@
+// When ‘Filtering and Searching by Text’ and ‘Viewing Phtos’, photos that do not need to be shown on the dom should be completely removed from the dom, instead of only being hidden from view
 // URL.revokeObjectURL()
 
 var addToAlbumButton = document.getElementById('js-add-to-album');
 var textInputs = document.querySelectorAll('.text-inputs');
 // var viewFavorites = document.getElementById('js-view-favorites');
-// var searchButton = document.getElementById('js-search');
 var chooseFileButton = document.getElementById('photo-input');
 var photosArray = [];
 var cardSection = document.querySelector('.card-section');
-var favoriteCounter = 0;
 
-// FIND A WAY TO KEEP THIS LOCAL!!!
+// FIND A WAY TO KEEP THESE LOCAL!!!
 var photoURL; 
+var favoriteCounter = 0;
 
 window.addEventListener('load', createCardsOnReload);
 chooseFileButton.addEventListener('change', getPhoto);
@@ -18,6 +18,8 @@ cardSection.addEventListener('dblclick', updateCard);
 addToAlbumButton.addEventListener('click', function() {
   saveNewPhotoCard(textInputs[0].value, textInputs[1].value, photoURL);
 });
+document.getElementById('js-search').addEventListener("keyup", liveSearch);
+document.querySelector('.show-button').addEventListener('click', showCards);
 
 cardSection.addEventListener('click', event => {
   if (event.target.classList.contains('delete-button')) {
@@ -92,6 +94,7 @@ function createCardsOnReload() {
       checkForFavorite(photoObj, cardTarget);
     });
     removeCardPlaceholder();
+    showRecentCards();
   } else {
     addCardPlaceholder();
   }
@@ -103,16 +106,9 @@ function deleteCard() {
   photosArray[index].deleteFromStorage(index);
   photosArray.splice(index, 1);
   event.target.closest('.photo-card').remove();
+  showRecentCards();
   if (photosArray.length === 0) {
     addCardPlaceholder();
-  }
-}
-
-function findIndexNumber(objId) {
-  for (var i = 0; i < photosArray.length; i++) {
-    if (photosArray[i].id === parseInt(objId)) {
-      return i
-    }
   }
 }
 
@@ -146,10 +142,30 @@ function findFavoriteTarget(id) {
   }
 }
 
+function findIndexNumber(objId) {
+  for (var i = 0; i < photosArray.length; i++) {
+    if (photosArray[i].id === parseInt(objId)) {
+      return i
+    }
+  }
+}
+
 function getPhoto(event) {
   photoURL = convertPhotoFile(event.target.files[0]);
   testTextFields();
 }
+
+function liveSearch() {
+  var searchInput = this.value;
+  var searchCardsText = document.querySelectorAll('.photo-card');
+  searchCardsText.forEach(card => {
+    if (card.innerText.toLowerCase().indexOf(searchInput) != -1) { 
+      card.classList.remove('hidden');
+    } else if (card.innerText.toLowerCase().indexOf(searchInput) <= -1) {
+      card.classList.add('hidden');
+    }
+  })   
+};
 
 function removeCardPlaceholder() {
   document.querySelector('.card-placeholder').classList.add('hide-placeholder');
@@ -170,6 +186,7 @@ function saveNewPhotoCard(title, caption, photoUrl) {
   removeCardPlaceholder();
   clearTextInputs();
   removeListeners();
+  showRecentCards();
 }
 
 function saveTextOnClick(event) {
@@ -196,6 +213,36 @@ function setUneditable() {
   event.target.contentEditable = false;
 }
 
+function showCards() {
+  var allCards = Array.from(document.querySelectorAll('.photo-card'));
+  if (event.target.innerText === 'Show More...') {
+    event.target.innerText = 'Show Less...';
+    allCards.forEach((card, i) => {
+      card.classList.remove('hidden');
+    });
+  } else {
+    event.target.innerText = 'Show More...';
+    showRecentCards();
+  }
+}
+
+function showRecentCards() {
+  var allCards = Array.from(document.querySelectorAll('.photo-card'));
+  var showButton = document.querySelector('.show-button');
+  if (photosArray.length >= 10) {
+    enableButton(showButton);
+    allCards.forEach((card, i) => {
+      if (i < 10) { 
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });  
+  } else {
+    disableButton(showButton);
+  }
+}
+
 function testTextFields() {
   checkTextFields();
   textInputs[0].addEventListener('input', checkTextFields);
@@ -219,6 +266,12 @@ function updateObject() {
   }
   photosArray[index].saveToStorage(photosArray);
 }
+
+
+
+
+
+
 
 
 
