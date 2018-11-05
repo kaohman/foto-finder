@@ -9,7 +9,6 @@ var photosArray = [];
 
 // FIND A WAY TO KEEP THESE LOCAL
 var photoURL; 
-var favoriteCounter = 0;
 
 window.addEventListener('load', createCardsOnReload);
 chooseFileButton.addEventListener('change', getPhoto);
@@ -73,12 +72,10 @@ function convertPhotoFile(photo) {
 }  
 
 function createCards(array) {
-  favoriteCounter = 0;
   array.reverse()
   for (var i = 0; i < array.length; i++) {
     if (array[i].favorite) {
       var favorited = 'favorite-button-active';
-      updateCounter(true);
     } else {
       var favorited = '';
     }
@@ -97,6 +94,7 @@ function createCards(array) {
       </div>`;
     cardSection.insertAdjacentHTML('afterbegin', cardHTML);
   }
+  favoritesCount();
 }
 
 function createCardsOnReload() {
@@ -116,11 +114,6 @@ function createCardsOnReload() {
 function deleteCard() {
   var objectId = event.target.parentElement.parentElement.dataset.id;
   var index = findIndexNumber(objectId);
-  
-  if(photosArray[index].favorite) {
-    favoriteCounter--;
-    document.getElementById('js-favorite-counter').innerText = favoriteCounter;
-  }
 
   photosArray[index].deleteFromStorage(index);
   photosArray.splice(index, 1);
@@ -141,6 +134,17 @@ function editText() {
 
 function enableButton(button) {
   button.disabled = false;
+}
+
+function favoritesCount() {
+  var favorites = photosArray.filter(photo => {
+    return photo.favorite === true
+  });
+  var counter = favorites.length;
+  if (viewFavoritesButton.innerText.indexOf('Favorites') !== -1) {
+    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${counter}</span> Favorites`;
+  }
+  return counter;
 }
 
 function findFavorites() {
@@ -176,7 +180,7 @@ function favoriteCard() {
   var index = findIndexNumber(objectId);
   photosArray[index].updateFavorite();
   photosArray[index].saveToStorage(photosArray);
-  updateCounter(photosArray[index].favorite);
+  favoritesCount();
   if (photosArray[index].favorite) {
     event.target.classList.add('favorite-button-active');
   } else {
@@ -287,13 +291,16 @@ function showFavorites() {
   var showFavorites = toggleFavoritesButton();
   if (showFavorites) {
     var favoritesArray = sortShownArray(findFavorites());
-    createCards(favoritesArray);
+    var sortedFavorites = favoritesArray.slice().reverse();
+    createCards(sortedFavorites);
     disableButton(showButton);
   } else {
     var showAll = photosArray.slice().reverse();
     createCards(showAll);
-    enableButton(showButton);
-    document.getElementById('js-favorite-counter').innerText = favoriteCounter;
+    if (photosArray.length > 10) {
+      enableButton(showButton);
+      showButton.innerText = 'Show Less...';
+    }
   }
 }
 
@@ -332,11 +339,12 @@ function testTextFields() {
 }
 
 function toggleFavoritesButton() {
-  if (viewFavoritesButton.innerHTML === `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`) {
+  var counter = favoritesCount();
+  if (viewFavoritesButton.innerHTML === `View <span id="js-favorite-counter">${counter}</span> Favorites`) {
     viewFavoritesButton.innerHTML = 'View All Photos';
     return true
   } else {
-    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`;
+    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${counter}</span> Favorites`;
     return false
   }
 }
@@ -356,17 +364,6 @@ function updateCard() {
     setEditable();
     document.body.addEventListener('keypress', saveTextOnEnter);
     event.target.addEventListener('blur', saveTextOnClick);
-  }
-}
-
-function updateCounter(bool) {
-  if (bool) { 
-    favoriteCounter++
-  } else {
-    favoriteCounter--
-  }
-  if (viewFavoritesButton.innerText.indexOf('Favorites') !== -1) {
-    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`;
   }
 }
 

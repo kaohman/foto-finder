@@ -12,6 +12,10 @@ body {
   background-color: #C2B2B4;
 }
 
+button:focus {
+  outline: 0;
+}
+
 /*HEADER*/
 .dark-background {
   background-color: #3E2A35;
