@@ -3,6 +3,8 @@ var cardSection = document.querySelector('.card-section');
 var chooseFileButton = document.getElementById('photo-input');
 var showButton = document.querySelector('.show-button');
 var textInputs = document.querySelectorAll('.text-inputs');
+// var updatePhotoButton = document.getElementById('change-photo');
+var viewFavoritesButton = document.getElementById('js-view-favorites');
 var photosArray = [];
 
 // FIND A WAY TO KEEP THESE LOCAL
@@ -17,6 +19,29 @@ addToAlbumButton.addEventListener('click', function() {
 });
 document.getElementById('js-search').addEventListener('keyup', liveSearch);
 showButton.addEventListener('click', showCards);
+viewFavoritesButton.addEventListener('click', showFavorites);
+
+cardSection.addEventListener('click', event => {
+  if (event.target.classList.contains('delete-button')) {
+    deleteCard(event);
+  } else if (event.target.classList.contains('favorite-button')) {
+    favoriteCard(event);
+  } 
+});
+
+cardSection.addEventListener('change', event => { 
+    updatePhoto(event);
+});
+
+function updatePhoto(event) {
+  var newPhotoUrl = convertPhotoFile(event.target.files[0]);
+  var objId = event.target.parentElement.dataset.id;
+  var index = findIndexNumber(objId);
+  photosArray[index].updatePhoto(newPhotoUrl);
+  photosArray[index].saveToStorage(photosArray);
+  var imgElement = event.target.previousElementSibling.firstElementChild;
+  imgElement.src = newPhotoUrl;
+}
 
 
 function addCardPlaceholder() {
@@ -60,7 +85,10 @@ function createCards(array) {
     var cardHTML = `
       <div class="photo-card" data-id=${array[i].id}>
         <p class="js-text title">${array[i].title}</p>
-        <img class="photo" src="${array[i].file}" alt="user uploaded photo">
+        <label class="photo-label" for="change-photo${i}">
+          <img class="photo" src="${array[i].file}" alt="user uploaded photo">
+        </label>
+        <input class="choose-input card-photo" type="file" accept="image/*" name="change-photo" id="change-photo${i}">
         <p class="js-text caption">${array[i].caption}</p>
         <section class="card-footer">
           <button class="icon-buttons delete-button"></button>
@@ -88,6 +116,12 @@ function createCardsOnReload() {
 function deleteCard() {
   var objectId = event.target.parentElement.parentElement.dataset.id;
   var index = findIndexNumber(objectId);
+  
+  if(photosArray[index].favorite) {
+    favoriteCounter--;
+    document.getElementById('js-favorite-counter').innerText = favoriteCounter;
+  }
+
   photosArray[index].deleteFromStorage(index);
   photosArray.splice(index, 1);
   event.target.closest('.photo-card').remove();
@@ -109,13 +143,21 @@ function enableButton(button) {
   button.disabled = false;
 }
 
-
+function findFavorites() {
+  var newArray = [];
+  for(var i = 0; i < photosArray.length; i++) {
+    if (photosArray[i].favorite === true) {
+      newArray.push(photosArray[i]);
+    }
+  }
+  return newArray
+}
 
 function findFavoriteTarget(id) {
   var cards = cardSection.children;
   for (var i = 0; i < cards.length; i++) {
     if(parseInt(cards[i].dataset.id) === id) {
-      return cards[i].firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.firstElementChild.nextElementSibling;
+      return cards[i].firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.firstElementChild.nextElementSibling;
     }
   }
 }
@@ -128,25 +170,18 @@ function findIndexNumber(objId) {
   }
 }
 
-// regular live search works on all cards (photosArray)
-// want favorites search to work only on favoriteArray when only favorites are shown
-
-function liveSearch(array) {
-  removeAllCards();
-  var searchInput = this.value;
-  if(viewFavoritesButton.innerHTML === 'View All Photos') {
-    favoritesSearch(searchInput);
-    return
+function favoriteCard() {
+  var cardTarget = event.target;
+  var objectId = cardTarget.parentElement.parentElement.dataset.id;
+  var index = findIndexNumber(objectId);
+  photosArray[index].updateFavorite();
+  photosArray[index].saveToStorage(photosArray);
+  updateCounter(photosArray[index].favorite);
+  if (photosArray[index].favorite) {
+    event.target.classList.add('favorite-button-active');
+  } else {
+    event.target.classList.remove('favorite-button-active');
   }
-
-  if (searchInput === '') {
-    showRecentCards();
-    return
-  }
-
-  var shownArray = searchObjectText(photosArray, searchInput);
-  shownArray = sortShownArray(shownArray);
-  createCards(shownArray);  
 }
 
 function favoritesSearch(input) {
@@ -158,6 +193,22 @@ function favoritesSearch(input) {
 function getPhoto(event) {
   photoURL = convertPhotoFile(event.target.files[0]);
   testTextFields();
+}
+
+function liveSearch(array) {
+  removeAllCards();
+  var searchInput = this.value;
+  if(viewFavoritesButton.innerHTML === 'View All Photos') {
+    favoritesSearch(searchInput);
+    return
+  }
+  if (searchInput === '') {
+    showRecentCards();
+    return
+  }
+  var shownArray = searchObjectText(photosArray, searchInput);
+  shownArray = sortShownArray(shownArray);
+  createCards(shownArray);  
 }
 
 function removeAllCards() {
@@ -230,6 +281,22 @@ function showCards() {
   }
 }
 
+function showFavorites() {
+  event.preventDefault();
+  removeAllCards();
+  var showFavorites = toggleFavoritesButton();
+  if (showFavorites) {
+    var favoritesArray = sortShownArray(findFavorites());
+    createCards(favoritesArray);
+    disableButton(showButton);
+  } else {
+    var showAll = photosArray.slice().reverse();
+    createCards(showAll);
+    enableButton(showButton);
+    document.getElementById('js-favorite-counter').innerText = favoriteCounter;
+  }
+}
+
 function showRecentCards() {
   removeAllCards();
   if (photosArray.length <= 10) {
@@ -264,6 +331,16 @@ function testTextFields() {
   textInputs[1].addEventListener('input', checkTextFields);
 }
 
+function toggleFavoritesButton() {
+  if (viewFavoritesButton.innerHTML === `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`) {
+    viewFavoritesButton.innerHTML = 'View All Photos';
+    return true
+  } else {
+    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`;
+    return false
+  }
+}
+
 function toggleShowButton() {
   if (showButton.innerText === 'Show More...') {
     showButton.innerText = 'Show Less...';
@@ -282,64 +359,6 @@ function updateCard() {
   }
 }
 
-function updateObject() {
-  var index = findIndexNumber(event.target.parentElement.dataset.id);
-  if (event.target.classList.contains('title')) {
-    photosArray[index].updateText(event.target.innerText, 'title');
-  } else {
-    photosArray[index].updateText(event.target.innerText, 'caption');
-  }
-  photosArray[index].saveToStorage(photosArray);
-}
-
-
-// FAVORITES BUTTON
-var viewFavoritesButton = document.getElementById('js-view-favorites');
-viewFavoritesButton.addEventListener('click', showFavorites);
-cardSection.addEventListener('click', event => {
-  if (event.target.classList.contains('delete-button')) {
-    deleteCard(event);
-  } else if (event.target.classList.contains('favorite-button')) {
-    favoriteCard(event);
-  }
-});
-
-function toggleFavoritesButton() {
-  if (viewFavoritesButton.innerHTML === `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`) {
-    viewFavoritesButton.innerHTML = 'View All Photos';
-    return true
-  } else {
-    viewFavoritesButton.innerHTML = `View <span id="js-favorite-counter">${favoriteCounter}</span> Favorites`;
-    return false
-  }
-}
-
-function findFavorites() {
-  var newArray = [];
-  for(var i = 0; i < photosArray.length; i++) {
-    if (photosArray[i].favorite === true) {
-      newArray.push(photosArray[i]);
-    }
-  }
-  return newArray
-}
-
-function showFavorites() {
-  event.preventDefault();
-  removeAllCards();
-  var showFavorites = toggleFavoritesButton();
-  if (showFavorites) {
-    var favoritesArray = sortShownArray(findFavorites());
-    createCards(favoritesArray);
-    disableButton(showButton);
-  } else {
-    var showAll = photosArray.slice().reverse();
-    createCards(showAll);
-    enableButton(showButton);
-    document.getElementById('js-favorite-counter').innerText = favoriteCounter;
-  }
-}
-
 function updateCounter(bool) {
   if (bool) { 
     favoriteCounter++
@@ -351,25 +370,15 @@ function updateCounter(bool) {
   }
 }
 
-function favoriteCard() {
-  var cardTarget = event.target;
-  var objectId = cardTarget.parentElement.parentElement.dataset.id;
-  var index = findIndexNumber(objectId);
-  photosArray[index].updateFavorite();
-  photosArray[index].saveToStorage(photosArray);
-  updateCounter(photosArray[index].favorite);
-  if (photosArray[index].favorite) {
-    event.target.classList.add('favorite-button-active');
+function updateObject() {
+  var index = findIndexNumber(event.target.parentElement.dataset.id);
+  if (event.target.classList.contains('title')) {
+    photosArray[index].updateText(event.target.innerText, 'title');
   } else {
-    event.target.classList.remove('favorite-button-active');
+    photosArray[index].updateText(event.target.innerText, 'caption');
   }
+  photosArray[index].saveToStorage(photosArray);
 }
-
-
-
-
-
-
 
 
 
