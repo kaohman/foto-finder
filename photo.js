@@ -36,8 +36,8 @@ class Photo {
     this[type] = newText;
   }
 
-  updatePhoto() {
-    
+  updatePhoto(newUrl) {
+    this.file = newUrl;
   }
 
   updateFavorite() {
