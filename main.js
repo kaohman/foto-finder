@@ -3,18 +3,15 @@ var cardSection = document.querySelector('.card-section');
 var chooseFileButton = document.getElementById('photo-input');
 var showButton = document.querySelector('.show-button');
 var textInputs = document.querySelectorAll('.text-inputs');
-// var updatePhotoButton = document.getElementById('change-photo');
 var viewFavoritesButton = document.getElementById('js-view-favorites');
 var photosArray = [];
-
-// FIND A WAY TO KEEP THESE LOCAL
-var photoURL; 
+var reader = new FileReader();
 
 window.addEventListener('load', createCardsOnReload);
 chooseFileButton.addEventListener('change', getPhoto);
 cardSection.addEventListener('dblclick', updateCard);
 addToAlbumButton.addEventListener('click', function() {
-  saveNewPhotoCard(textInputs[0].value, textInputs[1].value, photoURL);
+  saveNewPhotoCard(textInputs[0].value, textInputs[1].value);
 });
 document.getElementById('js-search').addEventListener('keyup', liveSearch);
 showButton.addEventListener('click', showCards);
@@ -33,13 +30,20 @@ cardSection.addEventListener('change', event => {
 });
 
 function updatePhoto(event) {
-  var newPhotoUrl = convertPhotoFile(event.target.files[0]);
+  var imgElement = event.target.previousElementSibling.firstElementChild;
   var objId = event.target.parentElement.dataset.id;
   var index = findIndexNumber(objId);
-  photosArray[index].updatePhoto(newPhotoUrl);
-  photosArray[index].saveToStorage(photosArray);
-  var imgElement = event.target.previousElementSibling.firstElementChild;
-  imgElement.src = newPhotoUrl;
+  
+  reader.readAsDataURL(event.target.files[0]);
+  reader.onload = function(event) {
+    updatePhotoURL(event, index, imgElement)
+  }
+}
+
+function updatePhotoURL(event, i, elem) {
+  photosArray[i].newPhoto(event.target.result);
+  photosArray[i].saveToStorage(photosArray);
+  elem.src = reader.result;
 }
 
 
@@ -195,7 +199,7 @@ function favoritesSearch(input) {
 }
 
 function getPhoto(event) {
-  photoURL = convertPhotoFile(event.target.files[0]);
+  reader.readAsDataURL(event.target.files[0]);
   testTextFields();
 }
 
@@ -228,9 +232,9 @@ function removeListeners() {
   textInputs[1].removeEventListener('input', checkTextFields);
 }
 
-function saveNewPhotoCard(title, caption, photoUrl) {
+function saveNewPhotoCard(title, caption) {
   event.preventDefault();
-  var photoObj = new Photo(title, caption, photoUrl);
+  var photoObj = new Photo(title, caption, reader.result);
   photosArray.push(photoObj);
   photoObj.saveToStorage(photosArray);
   disableButton(addToAlbumButton);
@@ -238,6 +242,7 @@ function saveNewPhotoCard(title, caption, photoUrl) {
   clearTextInputs();
   removeListeners();
   showRecentCards();
+  document.querySelector('#photo-input').value = '';
 }
 
 function saveTextOnClick(event) {
@@ -376,6 +381,7 @@ function updateObject() {
   }
   photosArray[index].saveToStorage(photosArray);
 }
+
 
 
 

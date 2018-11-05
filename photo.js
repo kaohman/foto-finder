@@ -36,7 +36,7 @@ class Photo {
     this[type] = newText;
   }
 
-  updatePhoto(newUrl) {
+  newPhoto(newUrl) {
     this.file = newUrl;
   }
 
