@@ -10,26 +10,26 @@
   <body>
     <div class="dark-background">
       <header>
-        <h1>FOTO<img class="logo" src="assets/foto-finder-logo.svg" alt="logo">FINDER</h1>
+        <h1>FOTO<img class="logo" src="assets/foto-finder-logo.svg" alt="photo finder logo">FINDER</h1>
         <div class="flex-search">
-          <input class="search-input" type="text" name="search-input" id="js-search" placeholder="Search">
+          <input class="search-input" type="text" name="search-input" id="js-search" placeholder="Search" aria-label="search through title and caption text to find a matching photo card">
           <button class="search-button"><img class="search-icon" src="assets/search.svg" alt="search icon"></button>
         </div>
       </header>
-      <form>
+      <form role="input title and caption text and upload a photo to add to your photo album">
         <label for="title">Title</label>
-        <input class="text-inputs" type="text" name="title" id="title">
+        <input class="text-inputs" type="text" name="title" id="title" aria-label="add a text title for your photo">
         <label for="caption">Caption</label>
-        <input class="text-inputs" type="text" name="caption" id="caption">
+        <input class="text-inputs" type="text" name="caption" id="caption" aria-label="add a text caption for your photo">
         <label class="form-buttons choose-label" for="photo-input">Choose File</label>
-        <input class="choose-input" type="file" accept="image/*" id="photo-input" name="input">
+        <input class="choose-input" type="file" accept="image/*" id="photo-input" name="input" aria-label="choose a photo from your computer to add to your album">
         <div class="bottom-buttons">
           <button class="form-buttons" id="js-view-favorites">View <span id="js-favorite-counter">0</span> Favorites</button>
           <button class="form-buttons" disabled id="js-add-to-album">Add to Album</button>
         </div>
       </form>
     </div>
-    <section class="card-section"></section>
+    <section class="card-section" role="area of the page to hold the photos you add to your album"></section>
     <p class="card-placeholder">Add some photos to your album!</p>
     <button class="show-button" disabled>Show More...</button>
     <script src="photo.js"></script>

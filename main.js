@@ -1,11 +1,12 @@
 var addToAlbumButton = document.getElementById('js-add-to-album');
 var cardSection = document.querySelector('.card-section');
 var chooseFileButton = document.getElementById('photo-input');
+var reader = new FileReader();
+var searchInput = document.getElementById('js-search');
 var showButton = document.querySelector('.show-button');
 var textInputs = document.querySelectorAll('.text-inputs');
 var viewFavoritesButton = document.getElementById('js-view-favorites');
 var photosArray = [];
-var reader = new FileReader();
 
 window.addEventListener('load', createCardsOnReload);
 chooseFileButton.addEventListener('change', getPhoto);
@@ -13,10 +14,9 @@ cardSection.addEventListener('dblclick', updateCard);
 addToAlbumButton.addEventListener('click', function() {
   saveNewPhotoCard(textInputs[0].value, textInputs[1].value);
 });
-document.getElementById('js-search').addEventListener('keyup', liveSearch);
+searchInput.addEventListener('keyup', liveSearch);
 showButton.addEventListener('click', showCards);
 viewFavoritesButton.addEventListener('click', showFavorites);
-
 cardSection.addEventListener('click', event => {
   if (event.target.classList.contains('delete-button')) {
     deleteCard(event);
@@ -24,28 +24,9 @@ cardSection.addEventListener('click', event => {
     favoriteCard(event);
   } 
 });
-
 cardSection.addEventListener('change', event => { 
     updatePhoto(event);
 });
-
-function updatePhoto(event) {
-  var imgElement = event.target.previousElementSibling.firstElementChild;
-  var objId = event.target.parentElement.dataset.id;
-  var index = findIndexNumber(objId);
-  
-  reader.readAsDataURL(event.target.files[0]);
-  reader.onload = function(event) {
-    updatePhotoURL(event, index, imgElement)
-  }
-}
-
-function updatePhotoURL(event, i, elem) {
-  photosArray[i].newPhoto(event.target.result);
-  photosArray[i].saveToStorage(photosArray);
-  elem.src = reader.result;
-}
-
 
 function addCardPlaceholder() {
   document.querySelector('.card-placeholder').classList.remove('hide-placeholder');
@@ -75,22 +56,21 @@ function convertPhotoFile(photo) {
   return window.URL.createObjectURL(photo);
 }  
 
-function createCards(array) {
-  array.reverse()
-  for (var i = 0; i < array.length; i++) {
-    if (array[i].favorite) {
+function createCards(cardArray) {
+  for (var i = 0; i < cardArray.length; i++) {
+    if (cardArray[i].favorite) {
       var favorited = 'favorite-button-active';
     } else {
       var favorited = '';
     }
     var cardHTML = `
-      <div class="photo-card" data-id=${array[i].id}>
-        <p class="js-text title">${array[i].title}</p>
+      <div class="photo-card" data-id=${cardArray[i].id}>
+        <p class="js-text title">${cardArray[i].title}</p>
         <label class="photo-label" for="change-photo${i}">
-          <img class="photo" src="${array[i].file}" alt="user uploaded photo">
+          <img class="photo" src="${cardArray[i].file}" alt="user uploaded photo">
         </label>
-        <input class="choose-input card-photo" type="file" accept="image/*" name="change-photo" id="change-photo${i}">
-        <p class="js-text caption">${array[i].caption}</p>
+        <input class="choose-input card-photo" type="file" accept="image/*" name="change-photo" id="change-photo${i}" aria-label="choose a new photo from your computer to update this photo card">
+        <p class="js-text caption">${cardArray[i].caption}</p>
         <section class="card-footer">
           <button class="icon-buttons delete-button"></button>
           <button class="icon-buttons favorite-button ${favorited}"></button>
@@ -193,7 +173,7 @@ function favoriteCard() {
 }
 
 function favoritesSearch(input) {
-  var favoritesArray = sortShownArray(findFavorites());
+  var favoritesArray = findFavorites();
   var shownArray = searchObjectText(favoritesArray, input);
   createCards(shownArray);
 }
@@ -215,7 +195,6 @@ function liveSearch(array) {
     return
   }
   var shownArray = searchObjectText(photosArray, searchInput);
-  shownArray = sortShownArray(shownArray);
   createCards(shownArray);  
 }
 
@@ -283,8 +262,7 @@ function showCards() {
   removeAllCards();
   var showMore = toggleShowButton();
   if (showMore) {
-    var showAll = photosArray.slice().reverse();
-    createCards(showAll);
+    createCards(photosArray);
   } else {
     showRecentCards();
   }
@@ -295,13 +273,11 @@ function showFavorites() {
   removeAllCards();
   var showFavorites = toggleFavoritesButton();
   if (showFavorites) {
-    var favoritesArray = sortShownArray(findFavorites());
-    var sortedFavorites = favoritesArray.slice().reverse();
-    createCards(sortedFavorites);
+    var favoritesArray = findFavorites();
+    createCards(favoritesArray);
     disableButton(showButton);
   } else {
-    var showAll = photosArray.slice().reverse();
-    createCards(showAll);
+    createCards(photosArray);
     if (photosArray.length > 10) {
       enableButton(showButton);
       showButton.innerText = 'Show Less...';
@@ -312,29 +288,14 @@ function showFavorites() {
 function showRecentCards() {
   removeAllCards();
   if (photosArray.length <= 10) {
-    var showAll = photosArray.slice().reverse();
-    createCards(showAll);
+    createCards(photosArray);
     disableButton(showButton);
   } else {
     enableButton(showButton);
-    var shownArray = photosArray.slice(photosArray.length-10, photosArray.length).reverse(); 
+    var shownArray = photosArray.slice(photosArray.length-10, photosArray.length); 
     createCards(shownArray);
     showButton.innerText = 'Show More...';
   }
-}
-
-function sortShownArray(array) {
-  array.sort(function(a, b) {
-    var idA = a.id;
-    var idB = b.id;
-    if (idA < idB) {
-      return -1;
-    }
-    if (idA > idB) {
-      return 1;
-    }
-  });
-  return array
 }
 
 function testTextFields() {
@@ -380,6 +341,23 @@ function updateObject() {
     photosArray[index].updateText(event.target.innerText, 'caption');
   }
   photosArray[index].saveToStorage(photosArray);
+}
+
+function updatePhoto(event) {
+  var imgElement = event.target.previousElementSibling.firstElementChild;
+  var objId = event.target.parentElement.dataset.id;
+  var index = findIndexNumber(objId);
+  
+  reader.readAsDataURL(event.target.files[0]);
+  reader.onload = function(event) {
+    updatePhotoURL(event, index, imgElement)
+  }
+}
+
+function updatePhotoURL(event, i, elem) {
+  photosArray[i].newPhoto(event.target.result);
+  photosArray[i].saveToStorage(photosArray);
+  elem.src = reader.result;
 }
 
 

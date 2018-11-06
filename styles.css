@@ -7,9 +7,9 @@
 }
 
 body {
-  padding: 0;
-  margin: 0;
   background-color: #C2B2B4;
+  margin: 0;
+  padding: 0;
 }
 
 button:focus {
@@ -57,8 +57,8 @@ label {
   border-radius: 5px 0 0 5px;
   border: 2px solid #C2B2B4;
   font-size: 15px;
-  width: 350px;
   line-height: 1.4;
+  width: 350px;
 }
 
 .search-input:placeholder {
@@ -72,10 +72,10 @@ label {
 .search-button {
   background-color: #C2B2B4;
   border-radius: 0 5px 5px 0;
+  border: none;
   margin: 0;
   padding: 10px;
   width: 40px;
-  border: none;
 }
 
 /*FORM*/
@@ -108,15 +108,15 @@ form {
 }
 
 .choose-label {
-  display: block;
-  margin-top: 40px;
   background-color: #5B4447;
   border: none;
   color: white;
+  display: block;
+  margin-top: 40px;
   margin: 40px 0 20px 0;
   padding: 15px 15px;
-  width: 100%;
   text-align: center;
+  width: 100%;
 }
 
 .choose-label:hover {
@@ -124,11 +124,11 @@ form {
 }
 
 .choose-input {
-  width: 0.1px;
   height: 0.1px;
   opacity: 0;
   overflow: hidden;
   position: absolute;
+  width: 0.1px;
   z-index: -1;
 }
 
@@ -154,14 +154,14 @@ input {
 }
 
 .card-placeholder {
-  margin: 0;
-  padding: 20px;
-  height: 200px;
+  animation-iteration-count: 2;
+  animation: text-animate 3s;
   background-color: #C2B2B4;
   font-size: 28px;
+  height: 200px;
+  margin: 0;
+  padding: 20px;
   text-align: center;
-  animation: text-animate 3s;
-  animation-iteration-count: 2;
 }
 
 @keyframes text-animate {
@@ -205,9 +205,9 @@ p {
 }
 
 .title {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .photo-label {
@@ -226,10 +226,10 @@ p {
 }
 
 .caption {
-  text-align: justify;
-  word-break: break-word;
   hyphens: auto;
   overflow: hidden;
+  text-align: justify;
+  word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
@@ -238,20 +238,20 @@ p {
 .card-footer {
   background-color: #5B4447;
   bottom: 0;
+  height: 50px;
   padding: 10px;
   position: absolute;
   width: 276px;
-  height: 50px;
 }
 
 .icon-buttons {
-  background-repeat: no-repeat;
   background-color: #5B4447;
+  background-repeat: no-repeat;
   border: none;
   height: 35px;
-  width: 40px;
   margin: 0;
   padding: 0;
+  width: 40px;
 }
 
 .delete-button {
@@ -290,13 +290,13 @@ p {
 }
 
 .show-button {
-  display: block;
-  color: white;
-  text-align: center;
-  margin: 20px auto;
-  padding: 8px;
   background-color: #5B4447;
   border: none;
+  color: white;
+  display: block;
+  margin: 20px auto;
+  padding: 8px;
+  text-align: center;
 }
 
 .show-button:hover:enabled {
