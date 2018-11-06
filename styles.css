@@ -145,7 +145,6 @@ input {
   width: 100%;
 }
 
-
 /*CARDS*/
 .card-section {
   display: grid;
@@ -161,6 +160,14 @@ input {
   background-color: #C2B2B4;
   font-size: 28px;
   text-align: center;
+  animation: text-animate 3s;
+  animation-iteration-count: 2;
+}
+
+@keyframes text-animate {
+  0% {transform:scale(1);}
+  50% {transform:scale(1.2); color: #e26d5a;}
+  100% {transform:scale(1);}
 }
 
 .hide-placeholder {
@@ -178,6 +185,16 @@ input {
 
 .hidden {
   display: none;
+}
+
+.photo-card {
+  animation: pop 1s 1;
+  background-color: white;
+}
+
+@keyframes pop {
+  from{transform:scale(0);}
+  to{transform:scale(1);}
 }
 
 p {
@@ -260,6 +277,16 @@ p {
 
 .favorite-button:hover {
   background-image: url('assets/favorite-active.svg');
+}
+
+.icon-buttons:hover {
+  animation: icon-pop 1.5s 1;
+}
+
+@keyframes icon-pop {
+  0% {transform:scale(1);}
+  50% {transform:scale(1.4);}
+  100% {transform:scale(1);}
 }
 
 .show-button {
