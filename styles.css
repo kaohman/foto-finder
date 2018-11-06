@@ -205,9 +205,9 @@ p {
 }
 
 .title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  height: 23px;
+  overflow: scroll;
+  word-break: break-word;
 }
 
 .photo-label {
@@ -226,13 +226,11 @@ p {
 }
 
 .caption {
+  height: 95px;
   hyphens: auto;
-  overflow: hidden;
+  overflow: scroll;
   text-align: justify;
   word-break: break-word;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
 }
 
 .card-footer {
@@ -267,7 +265,7 @@ p {
   top: 8px;
 }
 
-.favorite-button-active {
+.favorite-true {
   background-image: url('assets/favorite-active.svg');
 }
 
