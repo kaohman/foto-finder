@@ -1,12 +1,12 @@
 var addToAlbumButton = document.getElementById('js-add-to-album');
 var cardSection = document.querySelector('.card-section');
 var chooseFileButton = document.getElementById('photo-input');
-var reader = new FileReader();
 var searchInput = document.getElementById('js-search');
 var showButton = document.querySelector('.show-button');
 var textInputs = document.querySelectorAll('.text-inputs');
 var viewFavoritesButton = document.getElementById('js-view-favorites');
 var photosArray = [];
+var reader = new FileReader();
 
 window.addEventListener('load', createCardsOnReload);
 chooseFileButton.addEventListener('change', getPhoto);
