@@ -8,36 +8,19 @@ class Photo {
   }
 
   saveToStorage(array) {
-    var arrayJSON = JSON.stringify(array);
+    const arrayJSON = JSON.stringify(array);
     localStorage.setItem('array', arrayJSON);
   }
 
   deleteFromStorage(index) {
-    var retrievedJSON = localStorage.getItem('array');
-    var parsedObj = JSON.parse(retrievedJSON);
+    const retrievedJSON = localStorage.getItem('array');
+    const parsedObj = JSON.parse(retrievedJSON);
     parsedObj.splice(index, 1);
-
-    if (parsedObj.length === 0) {
-      localStorage.clear();
-    } else {
-      this.saveToStorage(parsedObj);
-    }
+    this.saveToStorage(parsedObj);
   }
 
-  findIndex(array, objId) {
-    for (var i = 0; i < array.length; i++) {
-      if (array[i].id === objId) {
-        return i
-      }
-    }
-  }
-
-  updateText(newText, type) {
-    this[type] = newText;
-  }
-
-  newPhoto(newUrl) {
-    this.file = newUrl;
+  updateItem(newItem, type) {
+    this[type] = newItem;
   }
 
   updateFavorite() {
